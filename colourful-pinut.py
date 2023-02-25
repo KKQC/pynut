@@ -5,6 +5,7 @@
 
 import math
 import time
+import os
 
 def clamp(x, a, b):
     return max(min(x, b), a)
@@ -34,7 +35,7 @@ def render_frame(A, B):
             else:
                 depth = 0.5 * (z / max(math.sqrt(x ** 2 + y ** 2), 0.01) + 1)
             depth = clamp(depth, 0, 1)  # clamp the depth value between 0 and 1
-            c = ".,-~:;=!*#$@"[min(int(depth * 14), len(".,-~:;=!*#$@") - 1)]
+            c = ".,-~:;=!*#$@"[min(int(depth * 10), 10)]
             # Add color to the character
             r = clamp(int(depth * 6), 0, 5) # red component
             g = clamp(int(depth * 12) - 6, 0, 5) # green component
@@ -48,13 +49,13 @@ def render_frame(A, B):
     return output
 
 
-# Initialize the angles for rotation
-theta = 0
-phi = 0
 
 # Initialize the angles for rotation
 theta = 0
 phi = 0
+
+# Set the terminal background color to black
+os.system("printf '\033[48;5;0m'")
 
 # Loop through and render each frame
 while True:
@@ -65,7 +66,6 @@ while True:
     print(frame)
     # Increment the angles for the next frame
     theta += 0.01
-    phi += 0.01
+    phi += 0.005
     # Wait a bit before rendering the next frame
-    time.sleep(0.01)
-
+    #time.sleep(0.01)
