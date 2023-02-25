@@ -6,6 +6,9 @@
 import math
 import time
 
+def clamp(x, a, b):
+    return max(min(x, b), a)
+
 def render_frame(A, B):
     # Dimensions of the donut
     dim_a = 70
@@ -30,23 +33,24 @@ def render_frame(A, B):
                 depth = 0.5 * (z / denom + 1)
             else:
                 depth = 0.5 * (z / max(math.sqrt(x ** 2 + y ** 2), 0.01) + 1)
-            depth = min(max(depth, 0), 1)  # clamp the depth value between 0 and 1
-            # Set the color based on the depth
-            if depth < 0.25:
-                color = "\033[38;2;255;0;0m"  # red
-            elif depth < 0.5:
-                color = "\033[38;2;255;165;0m"  # orange
-            elif depth < 0.75:
-                color = "\033[38;2;255;255;0m"  # yellow
-            else:
-                color = "\033[38;2;0;255;0m"  # green
-            # Assign the character to use based on depth
-            c = ".,-~:;=!*#$@"[min(int(depth * 14), 13)]
-            # Add the colored character to the output string
-            output += color + c + "\033[0m"
+            depth = clamp(depth, 0, 1)  # clamp the depth value between 0 and 1
+            c = ".,-~:;=!*#$@"[min(int(depth * 14), len(".,-~:;=!*#$@") - 1)]
+            # Add color to the character
+            r = clamp(int(depth * 6), 0, 5) # red component
+            g = clamp(int(depth * 12) - 6, 0, 5) # green component
+            b = clamp(int(depth * 18) - 12, 0, 5) # blue component
+            color_code = 16 + 36 * r + 6 * g + b # calculate the color code
+            c = "\x1b[48;5;{}m{}\x1b[0m".format(color_code, c) # add color to the character
+            # Append the character to the ASCII art string
+            output += c
         output += "\n"
     # Return the ASCII art string
     return output
+
+
+# Initialize the angles for rotation
+theta = 0
+phi = 0
 
 # Initialize the angles for rotation
 theta = 0
@@ -60,7 +64,8 @@ while True:
     frame = render_frame(theta, phi)
     print(frame)
     # Increment the angles for the next frame
-    theta += 0.05
-    phi += 0.02
+    theta += 0.01
+    phi += 0.01
     # Wait a bit before rendering the next frame
     time.sleep(0.01)
+
