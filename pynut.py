@@ -4,7 +4,7 @@ import time
 def render_frame(A, B):
     # Dimensions of the donut
     dim_a = 70
-    dim_b = 70
+    dim_b = 120
     # Parameters for the rotation
     cosA = math.cos(A)
     sinA = math.sin(A)
@@ -20,8 +20,16 @@ def render_frame(A, B):
             y = sinB * (j - dim_b / 2) + cosB * (i - dim_a / 2)
             z = 1.5 + math.sin(math.sqrt(x ** 2 + y ** 2) / 6.0)
             # Calculate the character to use based on depth
-            depth = 0.5 * (z / (math.sqrt(x ** 2 + y ** 2) + 0.0001) + 1)
-            c = ".,-~:;=!*#$@"[min(max(int(depth * 10), 0), 10)]
+            denom = math.sqrt(x ** 2 + y ** 2)
+
+            if denom > 0.0001:
+                depth = 0.5 * (z / denom + 1)
+            else:
+                depth = 0.5 * (z / max(math.sqrt(x ** 2 + y ** 2), 0.01) + 1)
+            depth = min(max(depth, 0), 1)  # clamp the depth value between 0 and 1
+            c = ".,-~:;=!*#$@"[min(int(depth * 14), 13) % len(".,-~:;=!*#$@")] # assign a value to 'c' inside the if-else block
+
+ 
             # Append the character to the ASCII art string
             output += c
         output += "\n"
