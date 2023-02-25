@@ -26,17 +26,24 @@ def render_frame(A, B):
             z = 1.5 + math.sin(math.sqrt(x ** 2 + y ** 2) / 6.0)
             # Calculate the character to use based on depth
             denom = math.sqrt(x ** 2 + y ** 2)
-
             if denom > 0.0001:
                 depth = 0.5 * (z / denom + 1)
             else:
                 depth = 0.5 * (z / max(math.sqrt(x ** 2 + y ** 2), 0.01) + 1)
             depth = min(max(depth, 0), 1)  # clamp the depth value between 0 and 1
-            c = ".,-~:;=!*#$@"[min(int(depth * 14), 13) % len(".,-~:;=!*#$@")] # assign a value to 'c' inside the if-else block
-
- 
-            # Append the character to the ASCII art string
-            output += c
+            # Set the color based on the depth
+            if depth < 0.25:
+                color = "\033[38;2;255;0;0m"  # red
+            elif depth < 0.5:
+                color = "\033[38;2;255;165;0m"  # orange
+            elif depth < 0.75:
+                color = "\033[38;2;255;255;0m"  # yellow
+            else:
+                color = "\033[38;2;0;255;0m"  # green
+            # Assign the character to use based on depth
+            c = ".,-~:;=!*#$@"[min(int(depth * 14), 13)]
+            # Add the colored character to the output string
+            output += color + c + "\033[0m"
         output += "\n"
     # Return the ASCII art string
     return output
